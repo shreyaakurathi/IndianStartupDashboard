@@ -1,0 +1,109 @@
+
+IF OBJECT_ID('Data_dash') IS NOT NULL DROP TABLE Data_dash
+
+CREATE TABLE Data_dash
+(
+[S No.] INT, 
+[Year] NVARCHAR (200), 
+[State] NVARCHAR (200), 
+Industry NVARCHAR (200), 
+[Count] INT
+); 
+
+-- SELECT * FROM Data_dash
+
+--IMPORT DATA
+
+BULK INSERT Data_dash 
+FROM 'C:\Users\shrey\OneDrive\Desktop\ML\StartupDashboard\indian_startups_by_state.csv'
+WITH (FORMAT = 'CSV'); 
+
+-- SELECT * FROM Data_dash
+ 
+ -- Create View to send only required data to dashbaord 
+
+CREATE VIEW dash_view AS -- this view groups in ascending order of date state wise
+SELECT
+    [Year],
+    [State],
+    Industry,
+    COUNT(*) AS no_of_startups
+FROM
+ Data_dash 
+GROUP BY
+    [Year],
+    [State],
+    Industry;
+
+-- DROP VIEW summary_statewise; 
+
+CREATE VIEW summary_statewise AS  --gives statewise industry summary 
+SELECT
+    [State] AS State,
+    SUM([Count]) AS total_startups,
+    COUNT(DISTINCT Industry) AS no_of_industries,
+    MAX([Year]) AS last_year_of_inaug
+FROM
+    Data_dash 
+GROUP BY
+    [State];
+
+CREATE VIEW industry_wise AS  -- industry wise summmary 
+SELECT
+    Industry,
+    [State],
+    SUM([Count]) AS no_of_startups,
+    MAX([Year]) AS recent_inaug_yr
+FROM
+    Data_dash 
+GROUP BY
+    Industry,[State];
+
+CREATE VIEW state_industry AS  -- state vs industry toatl view 
+SELECT
+    [State] AS State,
+    Industry,
+    SUM([Count]) AS total 
+FROM
+    Data_dash 
+GROUP BY
+    [State], Industry;
+
+-- SELECT * FROM state_industry;
+
+
+
+-- create procedure so that it can be compiled/ executed as an unit 
+
+CREATE PROCEDURE dashboard_input AS
+
+
+IF OBJECT_ID('Data_dash') IS NOT NULL DROP TABLE Data_dash
+
+CREATE TABLE Data_dash
+(
+[S No.] INT, 
+[Year] NVARCHAR (200), 
+[State] NVARCHAR (200), 
+Industry NVARCHAR (200), 
+[Count] INT
+); 
+
+-- SELECT * FROM Data_dash
+
+--IMPORT DATA
+
+BULK INSERT Data_dash 
+FROM 'C:\Users\shrey\OneDrive\Desktop\ML\StartupDashboard\indian_startups_by_state.csv'
+WITH (FORMAT = 'CSV'); 
+
+
+EXEC dashboard_input; 
+
+
+
+
+
+
+
+
